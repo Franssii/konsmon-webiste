@@ -1,5 +1,5 @@
 body {
-background-color: #333e48;
+background-color: #000000;
 font-family: Arial;
 }
 
@@ -7,23 +7,4 @@ h1 {
 color: #28343b;
 }
 
-header {
-background-color: #666666;
-text-align: center;
-padding: 12px;
-font-size: 12px;
-}
-	
-article {
-text-align: center;
-padding: 20px;
-height: 1400px; 
-}
-
-footer {
-background-color: #666666;
-text-align: center;
-padding: 12px;
-font-size: 12px;
-}
 	
