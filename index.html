@@ -10,7 +10,186 @@
       background: #f2f2f2;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: center;<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="gfx/radioactive_icon.png" type="image/x-icon">
+    <title>Konsmon</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #202324;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            align-self: flex-start;
+            text-align: center;
+            width: 100%;
+            color: white;
+        }
+
+        .chat-container {
+            background: #181a1b;
+            border: 1px solid #3e4446;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .messages {
+            flex-grow: 1;
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #3e4446;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #1b1d1e;
+        }
+
+        .message {
+            margin-bottom: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: #022f43;
+            color: white;
+        }
+
+        .input-box {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #3e4446;
+            border-radius: 4px;
+            background: #3e4446;
+            color: white;
+        }
+
+        button {
+            padding: 10px;
+            margin-left: 5px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #1976d2;
+            }
+
+        .nickname-box {
+            display: flex;
+            margin-top: 5px;
+        }
+
+            .nickname-box input {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #3e4446;
+                border-radius: 4px;
+                background: #3e4446;
+                color: white;
+            }
+    </style>
+
+
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+
+    <h1>KONSMON CZAT</h1>
+
+    <div class="chat-container">
+        <div class="messages" id="chatMessages"></div>
+
+        <div class="input-box">
+            <input type="text" id="messageInput" placeholder="Type here..." />
+            <button onclick="sendMessage()">SEND</button>
+        </div>
+
+        <div class="nickname-box">
+            <input type="text" id="nicknameInput" placeholder="Your nickname..." />
+        </div>
+    </div>
+
+    <script>
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBeDzJgPfga58CNlEFriKkxVBG-d04JXO4",
+            authDomain: "konsmon-website.firebaseapp.com",
+            projectId: "konsmon-website",
+            storageBucket: "konsmon-website.firebasestorage.app",
+            messagingSenderId: "1004639372000",
+            appId: "1:1004639372000:web:bca3d835a8e8df1e6e8685",
+            measurementId: "G-8G6B778QLW",
+            databaseURL: "https://konsmon-website-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const nicknameInput = document.getElementById('nicknameInput');
+
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            const nickname = nicknameInput.value.trim() || "Anonim";
+
+            if (text === "") return;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const message = {
+                nickname: nickname,
+                text: text,
+                time: timeString
+            };
+
+            db.ref("messages").push(message);
+            messageInput.value = "";
+        }
+
+
+        db.ref("messages").on("child_added", function (snapshot) {
+            const msg = snapshot.val();
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            msgDiv.textContent = `[${msg.time}] ${msg.nickname}: ${msg.text}`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+
+        messageInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+
       height: 100vh;
     }
 
@@ -95,7 +274,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Wciśnięcie Enter wysyła wiadomość
+    
     messageInput.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         sendMessage();
@@ -104,4 +283,5 @@
   </script>
 </body>
 </html>
+
 
