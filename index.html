@@ -5,7 +5,7 @@
   <title>Konsmon Czat</title>
   <link rel="icon" href="gfx/radioactive_icon.png" type="image/x-icon">
 
-  <!-- Firebase SDK (z wersji bez importów modułowych) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database-compat.js"></script>
 
@@ -26,7 +26,7 @@
       text-align: center;
       width: 100%;
       color: white;
-      padding-left: 10px;
+      padding-left: 0px;
     }
 
     .chat-container {
@@ -119,7 +119,7 @@
   </div>
 
   <script>
-    // KONFIGURACJA FIREBASE – z Twojego SDK
+    // KONFIGURACJA FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyBeDzJgPfga58CNlEFriKkxVBG-d04JXO4",
       authDomain: "konsmon-website.firebaseapp.com",
@@ -158,7 +158,7 @@
       messageInput.value = "";
     }
 
-    // Nasłuch na nowe wiadomości
+  
     db.ref("messages").on("child_added", function(snapshot) {
       const msg = snapshot.val();
       const msgDiv = document.createElement('div');
@@ -168,7 +168,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-    // Enter = wyślij
+
     messageInput.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         sendMessage();
@@ -177,3 +177,4 @@
   </script>
 </body>
 </html>
+
