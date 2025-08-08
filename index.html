@@ -2,12 +2,12 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
+  <title>Konsmon Czat</title>
   <link rel="icon" href="gfx/radioactive_icon.png" type="image/x-icon">
-  <title>Konsmon</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database.js"></script>
+  <!-- Firebase SDK (z wersji bez importów modułowych) -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database-compat.js"></script>
 
   <style>
     body {
@@ -26,6 +26,7 @@
       text-align: center;
       width: 100%;
       color: white;
+      padding-left: 10px;
     }
 
     .chat-container {
@@ -100,7 +101,6 @@
     }
   </style>
 </head>
-
 <body>
 
   <h1>KONSMON CZAT</h1>
@@ -119,7 +119,7 @@
   </div>
 
   <script>
-    // Twoja konfiguracja Firebase
+    // KONFIGURACJA FIREBASE – z Twojego SDK
     const firebaseConfig = {
       apiKey: "AIzaSyBeDzJgPfga58CNlEFriKkxVBG-d04JXO4",
       authDomain: "konsmon-website.firebaseapp.com",
@@ -127,11 +127,11 @@
       projectId: "konsmon-website",
       storageBucket: "konsmon-website.firebasestorage.app",
       messagingSenderId: "1004639372000",
-      appId: "1:1004639372000:web:bca3d835a8e8df1e6e8685",
-      measurementId: "G-8G6B778QLW"
+      appId: "1:1004639372000:web:49980358b5ac43526e8685",
+      measurementId: "G-WJE8C8CY3E"
     };
 
-    // Inicjalizacja Firebase
+    // Inicjalizacja
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -154,12 +154,12 @@
         time: timeString
       };
 
-      db.ref("messages").push(message); // Zapisz do bazy
+      db.ref("messages").push(message);
       messageInput.value = "";
     }
 
-    // Wyświetlanie wiadomości w czasie rzeczywistym
-    db.ref("messages").on("child_added", function (snapshot) {
+    // Nasłuch na nowe wiadomości
+    db.ref("messages").on("child_added", function(snapshot) {
       const msg = snapshot.val();
       const msgDiv = document.createElement('div');
       msgDiv.className = 'message';
@@ -168,7 +168,8 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
 
-    messageInput.addEventListener("keypress", function (event) {
+    // Enter = wyślij
+    messageInput.addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         sendMessage();
       }
