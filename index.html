@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en-gb">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Konsmon — multiroom</title>
+    <title>Konsmon Chat — multiroom (dark)</title>
     <link rel="icon" href="gfx/radioactive_icon.png" type="image/x-icon">
 
     <!-- Firebase SDK (compat) -->
@@ -12,13 +12,13 @@
 
     <style>
         :root {
-            --bg: #202324;
-            --panel: #181a1b;
-            --muted: #3e4446;
-            --card: #1b1d1e;
-            --accent: #2196f3;
-            --accent-hover: #1976d2;
-            --text: #fff;
+            --bg: #0f1112;
+            --panel: #131516;
+            --muted: #2f3334;
+            --card: #0f1213;
+            --accent: #0ea5ff;
+            --accent-hover: #0284c7;
+            --text: #e6eef3;
         }
 
         * {
@@ -28,37 +28,36 @@
         html, body {
             height: 100%;
             margin: 0;
-            font-family: Arial,Helvetica,sans-serif;
+            font-family: Inter,Arial,Helvetica,sans-serif;
             background: var(--bg);
             color: var(--text)
         }
 
-        /* App layout */
+        /* Layout */
         .app {
             height: 94vh;
             width: 96vw;
             margin: 1vh auto;
             display: flex;
-            gap: 12px;
-            align-items: stretch;
+            gap: 14px;
+            align-items: stretch
         }
 
-        /* Left sidebar (lista czatów) */
+        /* Sidebar */
         .sidebar {
-            width: 320px;
-            min-width: 220px;
+            width: 300px;
+            min-width: 200px;
             background: var(--panel);
             border: 1px solid var(--muted);
             border-radius: 8px;
             padding: 12px;
             display: flex;
-            flex-direction: column;
-            height: 100%;
+            flex-direction: column
         }
 
             .sidebar h2 {
                 margin: 4px 0 10px 6px;
-                font-size: 16px
+                font-size: 15px
             }
 
         .chat-list {
@@ -71,18 +70,18 @@
         }
 
         .chat-item {
-            background: var(--card);
+            background: linear-gradient(180deg,#0d1112,#111315);
             border: 1px solid var(--muted);
             padding: 10px;
             border-radius: 6px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center
         }
 
             .chat-item:hover {
-                outline: 2px solid rgba(33,150,243,0.12)
+                outline: 2px solid rgba(14,165,255,0.08)
             }
 
         .chat-title {
@@ -91,7 +90,7 @@
 
         .chat-meta {
             font-size: 12px;
-            opacity: .8
+            opacity: .75
         }
 
         .sidebar-footer {
@@ -109,7 +108,7 @@
 
         .btn-primary {
             background: var(--accent);
-            color: white
+            color: #002;
         }
 
         .btn-ghost {
@@ -118,13 +117,12 @@
             color: var(--text)
         }
 
-        /* Main area */
+        /* Main */
         .main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            height: 100%;
+            height: 100%
         }
 
         .panel {
@@ -134,19 +132,18 @@
             padding: 12px;
             flex: 1;
             display: flex;
-            flex-direction: column;
+            flex-direction: column
         }
-
 
         .welcome {
             margin: auto;
-            max-width: 720px;
-            width: 70%;
+            max-width: 760px;
+            width: 72%;
             background: var(--card);
             border-radius: 8px;
             padding: 24px;
             border: 1px solid var(--muted);
-            text-align: center;
+            text-align: center
         }
 
             .welcome h3 {
@@ -169,38 +166,63 @@
                 color: var(--text)
             }
 
-
-        .messages {
-            flex: 1;
-            overflow: auto;
-            padding: 12px;
-            border-radius: 6px;
-            background: linear-gradient(180deg,#111 0%, #111 100%)
-        }
-
-        .message {
-            margin-bottom: 8px;
-            padding: 8px;
-            border-radius: 6px;
-            background: #022f43;
-            color: white
-        }
-
+        /* Chat area */
         .chat-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px
+            margin-bottom: 10px
         }
 
+            .chat-top .meta {
+                font-size: 13px;
+                opacity: .8
+            }
+
+        /* messages container: fixed header + flexible scrollable area */
+        .messages {
+            flex: 1;
+            overflow: auto;
+            padding: 14px;
+            border-radius: 6px;
+            background: linear-gradient(180deg,#070808,#0a0b0c);
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        /* message bubble */
+        .message {
+            display: inline-block;
+            max-width: 72%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #02475e;
+            color: var(--text);
+            word-wrap: break-word
+        }
+
+        .meta-line {
+            font-size: 12px;
+            opacity: .85;
+            margin-bottom: 6px
+        }
+
+        /* input row: nickname (short) on left, message input on right */
         .input-row {
             display: flex;
             gap: 8px;
-            margin-top: 10px
+            margin-top: 10px;
+            align-items: center
         }
 
-            .input-row input[type="text"] {
-                flex: 1;
+        .nick-input {
+            width: 22%;
+            min-width: 120px
+        }
+
+            .nick-input input {
+                width: 100%;
                 padding: 10px;
                 border-radius: 6px;
                 border: 1px solid var(--muted);
@@ -208,7 +230,30 @@
                 color: var(--text)
             }
 
+        .msg-input {
+            flex: 1;
+            display: flex;
+            gap: 8px
+        }
 
+            .msg-input input {
+                flex: 1;
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid var(--muted);
+                background: #0f1415;
+                color: var(--text)
+            }
+
+        .send-btn {
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 0;
+            background: var(--accent);
+            cursor: pointer
+        }
+
+        /* Modal */
         .modal-backdrop {
             position: fixed;
             inset: 0;
@@ -239,7 +284,7 @@
             }
 
         /* small screens */
-        @media(max-width:800px) {
+        @media(max-width:900px) {
             .app {
                 flex-direction: column;
                 height: 95vh
@@ -248,7 +293,7 @@
             .sidebar {
                 width: 100%;
                 min-width: unset;
-                height: 160px;
+                height: 180px;
                 order: 2
             }
 
@@ -260,34 +305,34 @@
                 width: 92%
             }
 
-
+            .nick-input {
+                width: 30%
+            }
         }
     </style>
 </head>
 <body>
-    <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:white;margin-left: 50px">KONSMON CZAT</h1>
+    <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:var(--text)">KONSMON CHAT</h1>
 
     <div class="app">
         <div class="sidebar">
             <h2>Chat list</h2>
             <div id="chatList" class="chat-list">Loading...</div>
-
             <div class="sidebar-footer">
                 <button id="btnCreate" class="btn btn-primary">Create new</button>
-                <button id="btnRefresh" class="btn btn-ghost">Refersh</button>
+                <button id="btnRefresh" class="btn btn-ghost">Refresh</button>
             </div>
         </div>
 
         <div class="main">
             <div class="panel" id="mainPanel">
-                <!-- dynamic content here -->
-                <div id="welcomeArea" class="welcome">
-                    <h3>Select a chat or create a new one</h3>
-                    <p>You can create a new chat (name + password) or trying to find an existing one.</p>
 
+                <div id="welcomeArea" class="welcome">
+                    <h3>Welcome — choose a chat or create new</h3>
+                    <p>Create a chat (name + password) or join an existing one by clicking it from the list on the left.</p>
                     <div class="inputs">
                         <button id="createQuick" class="btn btn-primary">Create new chat</button>
-                        <div style="align-self:center">— OR —</div>
+                        <div style="align-self:center">— or —</div>
                         <div style="display:flex;gap:6px;align-items:center">
                             <input id="searchInput" placeholder="Search..." />
                             <button id="searchBtn" class="btn btn-ghost">Search</button>
@@ -295,25 +340,26 @@
                     </div>
                 </div>
 
-                <!-- Chat area (hidden until join) -->
                 <div id="chatArea" style="display:none;flex-direction:column;height:100%">
                     <div class="chat-top">
                         <div>
                             <strong id="chatTitle">—</strong>
-                            <div id="chatSubtitle" style="font-size:12px;opacity:.8">ID: —</div>
+                            <div id="chatSubtitle" class="meta">ID: —</div>
                         </div>
                         <div style="display:flex;gap:8px;align-items:center">
                             <button id="leaveBtn" class="btn btn-ghost">Leave</button>
-                            <button id="deleteBtn" class="btn" style="background:#c62828;color:white">Delete chat</button>
+                            <button id="deleteBtn" class="btn" style="background:#b91c1c;color:white">Delete chat</button>
                         </div>
                     </div>
 
                     <div id="messages" class="messages"></div>
 
                     <div class="input-row">
-                        <input type="text" id="nicknameInput" placeholder="Twój nick..." />
-                        <input type="text" id="messageInput" placeholder="Napisz wiadomość i wciśnij Enter..." />
-                        <button id="sendBtn" class="btn btn-primary">Wyślij</button>
+                        <div class="nick-input"><input id="nicknameInput" placeholder="Your nick..." /></div>
+                        <div class="msg-input">
+                            <input id="messageInput" placeholder="Type a message and press Enter..." />
+                            <button id="sendBtn" class="send-btn">Send</button>
+                        </div>
                     </div>
                 </div>
 
@@ -321,15 +367,12 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div id="modal" class="modal-backdrop">
-        <div class="modal" id="modalContent">
-            <!-- injected -->
-        </div>
+        <div class="modal" id="modalContent"></div>
     </div>
 
     <script>
-        // ---------- KONFIGURACJA FIREBASE (użyj Twoich danych z projektu) ----------
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBeDzJgPfga58CNlEFriKkxVBG-d04JXO4",
             authDomain: "konsmon-website.firebaseapp.com",
@@ -344,7 +387,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ---------- UI refs ----------
+        // UI refs
         const chatListEl = document.getElementById('chatList');
         const btnCreate = document.getElementById('btnCreate');
         const btnRefresh = document.getElementById('btnRefresh');
@@ -366,203 +409,116 @@
         const modal = document.getElementById('modal');
         const modalContent = document.getElementById('modalContent');
 
-        // ---------- State ----------
+        // state
         let chatsCache = {};
         let currentChatId = null;
         let currentChatRef = null;
-        let messagesListener = null;
+        let messagesRef = null;
 
-        // ---------- Helpers ----------
-        function showModal(html) {
-            modalContent.innerHTML = html;
-            modal.style.display = 'flex';
-        }
+        function showModal(html) { modalContent.innerHTML = html; modal.style.display = 'flex'; }
         function closeModal() { modal.style.display = 'none'; modalContent.innerHTML = ''; }
+        function escapeHtml(text) { return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-        function sanitize(str) {
-            return String(str || '').replace(/<|>|\$|\{|\}|\[|\]|\.|\//g, '');
-        }
+        // render list
+        const chatsRef = db.ref('chats');
+        chatsRef.on('value', snap => { chatsCache = snap.val() || {}; renderChatList(searchInput.value.trim()); });
 
         function renderChatList(filter) {
             chatListEl.innerHTML = '';
             const entries = Object.entries(chatsCache);
-            if (entries.length === 0) { chatListEl.textContent = 'Create new chat.'; return; }
-
-            const filtered = entries.filter(([id, c]) => !filter || c.name.toLowerCase().includes(filter.toLowerCase()));
-            if (filtered.length === 0) { chatListEl.textContent = 'A chat with this name does not exist'; return; }
-
+            if (entries.length === 0) { chatListEl.textContent = 'No chats yet. Create one.'; return; }
+            const filtered = entries.filter(([id, c]) => !filter || (c.name || '').toLowerCase().includes(filter.toLowerCase()));
+            if (filtered.length === 0) { chatListEl.textContent = 'No chats found.'; return; }
             filtered.forEach(([id, chat]) => {
-                const el = document.createElement('div');
-                el.className = 'chat-item';
-                el.innerHTML = `<div>
-              <div class="chat-title">${escapeHtml(chat.name)}</div>
-              <div class="chat-meta">${chat.desc || ''}</div>
-              </div>
-              <div style="text-align:right;font-size:12px;color:rgba(255,255,255,.75)">ID:${id.slice(0, 6)}</div>`;
-
-                el.onclick = () => { attemptJoin(id); };
+                const el = document.createElement('div'); el.className = 'chat-item';
+                el.innerHTML = `<div style="min-width:0"><div class=\"chat-title\">${escapeHtml(chat.name)}</div><div class=\"chat-meta\">${chat.desc || ''}</div></div><div style=\"text-align:right;font-size:12px;color:rgba(255,255,255,.75)\">ID:${id.slice(0, 6)}</div>`;
+                el.onclick = () => attemptJoin(id);
                 chatListEl.appendChild(el);
             });
         }
 
-        function escapeHtml(text) {
-            return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
-        // ---------- Firebase listeners: chats list ----------
-        const chatsRef = db.ref('chats');
-        chatsRef.on('value', snapshot => {
-            const data = snapshot.val() || {};
-            chatsCache = data;
-            renderChatList(searchInput.value.trim());
-        });
-
-        // ---------- Create chat flow ----------
+        // create modal
         function openCreateModal() {
             showModal(`
             <h4>Create new chat</h4>
-            <div class="row">
-              <label>Nazwa</label>
-              <input id="newName" placeholder="np. RocketLab" />
-            </div>
-            <div class="row">
-              <label>Hasło</label>
-              <input id="newPass" placeholder="password" />
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-              <button id="cancelCreate" class="btn btn-ghost">Anuluj</button>
-              <button id="confirmCreate" class="btn btn-primary">Create</button>
-            </div>
+            <div class="row"><label>Name</label><input id="newName" placeholder="e.g. RocketLab" /></div>
+            <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
           `);
-
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
-                const name = sanitize(document.getElementById('newName').value.trim());
-                const pass = document.getElementById('newPass').value || '';
-                if (!name) { alert('Enter a chat name:'); return; }
-
-                // create chat as pushed node
+                const name = String(document.getElementById('newName').value || '').trim();
+                const pass = String(document.getElementById('newPass').value || '');
+                if (!name) { alert('Provide chat name'); return; }
                 const newRef = chatsRef.push();
-                newRef.set({ name: name, password: pass, createdAt: Date.now() }).then(() => {
-                    closeModal();
-                    // auto join
-                    attemptJoin(newRef.key, true, pass);
-                }).catch(err => { alert('ERROR: ' + err.message) });
+                newRef.set({ name: name, password: pass, createdAt: Date.now() }).then(() => { closeModal(); attemptJoin(newRef.key, true, pass); }).catch(e => alert('Error: ' + e.message));
             }
         }
 
-        btnCreate.onclick = openCreateModal;
-        createQuick.onclick = openCreateModal;
-        btnRefresh.onclick = () => { renderChatList(searchInput.value.trim()); };
+        btnCreate.onclick = openCreateModal; createQuick.onclick = openCreateModal; btnRefresh.onclick = () => renderChatList(searchInput.value.trim());
 
-        // ---------- Join flow ----------
-        function attemptJoin(chatId, skipPrompt = false, knownPass = '') {
-            const chat = chatsCache[chatId];
-            if (!chat) { alert('Czat dose not exist'); return; }
-
-            if (skipPrompt) { joinChat(chatId, knownPass); return; }
-
-            // ask for password
-            showModal(`
-            <h4>Dołącz do: ${escapeHtml(chat.name)}</h4>
-            <div class="row"><label>Passowrd</label><input id="joinPass" type="password" placeholder="Password" /></div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-              <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-              <button id="confirmJoin" class="btn btn-primary">Join</button>
-            </div>
-          `);
+        // join modal
+        function attemptJoin(id, skipPrompt = false, knownPass = '') {
+            const chat = chatsCache[id]; if (!chat) { alert('Chat not found'); return; }
+            if (skipPrompt) { joinChat(id); return; }
+            showModal(`<h4>Join ${escapeHtml(chat.name)}</h4><div class="row"><label>Password</label><input id="joinPass" type="password" placeholder="Password"/></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelJoin" class="btn btn-ghost">Cancel</button><button id="confirmJoin" class="btn btn-primary">Join</button></div>`);
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
-                const p = document.getElementById('joinPass').value || '';
-                if (p === (chat.password || '')) {
-                    closeModal();
-                    joinChat(chatId, p);
-                } else alert('Wrong password');
+                const p = String(document.getElementById('joinPass').value || '');
+                if (p === (chat.password || '')) { closeModal(); joinChat(id, p); } else alert('Wrong password');
             }
         }
 
-        function joinChat(chatId, pass) {
-            currentChatId = chatId;
-            currentChatRef = db.ref('chats/' + chatId);
-            // render chat UI
-            const chat = chatsCache[chatId];
-            chatTitle.textContent = chat.name || '—';
-            chatSubtitle.textContent = 'ID: ' + chatId;
-            welcomeArea.style.display = 'none';
-            chatArea.style.display = 'flex';
-            messagesEl.innerHTML = '';
+        function joinChat(id) {
+            currentChatId = id; currentChatRef = db.ref('chats/' + id);
+            const chat = chatsCache[id] || {};
+            chatTitle.textContent = chat.name || '—'; chatSubtitle.textContent = 'ID: ' + id;
+            welcomeArea.style.display = 'none'; chatArea.style.display = 'flex'; messagesEl.innerHTML = '';
 
-            // attach messages listener
-            const messagesRef = db.ref(`chats/${chatId}/messages`);
-            if (messagesListener) messagesListener.off();
-            messagesListener = messagesRef;
-            messagesRef.off();
+            // detach previous
+            if (messagesRef) messagesRef.off();
+            messagesRef = db.ref(`chats/${id}/messages`);
+
+            // listen for additions
             messagesRef.on('child_added', snap => {
                 const m = snap.val();
-                const d = document.createElement('div'); d.className = 'message';
-                d.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}: ${m.text || ''}`;
-                messagesEl.appendChild(d);
+                const msgWrap = document.createElement('div');
+                const meta = document.createElement('div'); meta.className = 'meta-line'; meta.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}`;
+                const bubble = document.createElement('div'); bubble.className = 'message'; bubble.textContent = m.text || '';
+                msgWrap.appendChild(meta); msgWrap.appendChild(bubble);
+                messagesEl.appendChild(msgWrap);
+                // keep scroll at bottom
                 messagesEl.scrollTop = messagesEl.scrollHeight;
             });
 
-            // optional: load some previous messages snapshot (child_added already does)
+            // keep layout stable even with many messages (messages container is scrollable)
         }
 
-        // ---------- Leave / Delete ----------
-        leaveBtn.onclick = () => {
-            if (!currentChatId) return;
-            if (!confirm('Exit chat?')) return;
-            detachChat();
-        }
-
-        function detachChat() {
-            if (messagesListener) messagesListener.off();
-            currentChatId = null;
-            currentChatRef = null;
-            messagesEl.innerHTML = '';
-            chatArea.style.display = 'none';
-            welcomeArea.style.display = 'block';
-            chatTitle.textContent = '—';
-            chatSubtitle.textContent = '—';
-        }
+        leaveBtn.onclick = () => { if (!currentChatId) return; if (!confirm('Leave chat?')) return; detachChat(); }
+        function detachChat() { if (messagesRef) messagesRef.off(); currentChatId = null; currentChatRef = null; messagesEl.innerHTML = ''; chatArea.style.display = 'none'; welcomeArea.style.display = 'block'; chatTitle.textContent = '—'; chatSubtitle.textContent = '—'; }
 
         deleteBtn.onclick = () => {
-            if (!currentChatId) return;
-            if (!confirm('Delete the entire chat? (this action can not be undone)')) return;
-            db.ref('chats/' + currentChatId).remove().then(() => {
-                alert('CHAT DELETED');
-                detachChat();
-            }).catch(err => alert('ERROR: ' + err.message));
+            if (!currentChatId) return; if (!confirm('Delete this chat and all messages? This cannot be undone.')) return;
+            db.ref('chats/' + currentChatId).remove().then(() => { alert('Chat deleted'); detachChat(); }).catch(e => alert('Error: ' + e.message));
         }
 
-        // ---------- Sending messages ----------
         function sendMessage() {
-            if (!currentChatId) { alert('You need to join a chat'); return; }
-            const text = messageInput.value.trim();
-            const nick = nicknameInput.value.trim() || 'Anonim';
+            if (!currentChatId) { alert('Join a chat first'); return; }
+            const text = String(messageInput.value || '').trim();
+            const nick = String(nicknameInput.value || '').trim() || 'Anon';
             if (!text) return;
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const ref = db.ref(`chats/${currentChatId}/messages`).push();
-            ref.set({ nickname: nick, text: text, time: time }).then(() => {
-                messageInput.value = '';
-            }).catch(err => alert('ERROR: ' + err.message));
+            const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            db.ref(`chats/${currentChatId}/messages`).push({ nickname: nick, text: text, time: t }).then(() => { messageInput.value = ''; messageInput.focus(); }).catch(e => alert('Error: ' + e.message));
         }
 
-        sendBtn.onclick = sendMessage;
-        messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+        sendBtn.onclick = sendMessage; messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
-        // ---------- Search ----------
-        searchBtn.onclick = () => { renderChatList(searchInput.value.trim()); };
-        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') renderChatList(searchInput.value.trim()); });
+        searchBtn.onclick = () => renderChatList(searchInput.value.trim()); searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') renderChatList(searchInput.value.trim()); });
 
-        // ---------- small helpers ----------
-        // click outside modal to close
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-        // initial render
+        // initial
         renderChatList();
-
-        // optional: keep chatsRef.on('child_changed') handled by value listener above
     </script>
 </body>
 </html>
