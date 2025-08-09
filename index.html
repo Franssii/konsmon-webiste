@@ -1,3 +1,6 @@
+
+<!-- BY FRANS -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -328,7 +331,7 @@
             <div class="panel" id="mainPanel">
 
                 <div id="welcomeArea" class="welcome">
-                    <h3>Welcome — choose a chat or create new</h3>
+                    <h3>Choose a chat or create new</h3>
                     <p>Create a chat (name + password) or join an existing one by clicking it from the list on the left.</p>
                     <div class="inputs">
                         <button id="createQuick" class="btn btn-primary">Create new chat</button>
@@ -440,11 +443,11 @@
         // create modal
         function openCreateModal() {
             showModal(`
-            <h4>Create new chat</h4>
-            <div class="row"><label>Name</label><input id="newName" placeholder="e.g. RocketLab" /></div>
-            <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
-          `);
+                <h4>Create new chat</h4>
+                <div class="row"><label>Name</label><input id="newName" placeholder="e.g. RocketLab" /></div>
+                <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
+              `);
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
                 const name = String(document.getElementById('newName').value || '').trim();
