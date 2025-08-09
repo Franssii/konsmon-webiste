@@ -320,7 +320,7 @@
 
     <div class="app">
         <div class="sidebar">
-            <h2>Chat list</h2>
+            <h2>CHAT LIST: </h2>
             <div id="chatList" class="chat-list">Loading...</div>
             <div class="sidebar-footer">
                 <button id="btnCreate" class="btn btn-primary">Create new</button>
@@ -444,11 +444,11 @@
         // create modal
         function openCreateModal() {
             showModal(`
-                        <h4>Create new chat</h4>
-                        <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                        <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
-                      `);
+                            <h4>Create new chat</h4>
+                            <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                            <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
+                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
+                          `);
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
                 const name = String(document.getElementById('newName').value || '').trim();
