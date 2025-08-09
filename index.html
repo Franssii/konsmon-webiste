@@ -508,8 +508,12 @@
             const chat = chatsCache[id] || {};
             chatTitle.textContent = chat.name || '—'; chatSubtitle.textContent = 'ID: ' + id;
             welcomeArea.style.display = 'none'; chatArea.style.display = 'flex'; messagesEl.innerHTML = '';
+
+            // detach previous
             if (messagesRef) messagesRef.off();
             messagesRef = db.ref(`chats/${id}/messages`);
+
+            // listen for additions
             messagesRef.on('child_added', snap => {
                 const m = snap.val();
                 const msgWrap = document.createElement('div');
@@ -517,4 +521,39 @@
                 const bubble = document.createElement('div'); bubble.className = 'message'; bubble.textContent = m.text || '';
                 msgWrap.appendChild(meta); msgWrap.appendChild(bubble);
                 messagesEl.appendChild(msgWrap);
+                // keep scroll at bottom
                 messagesEl.scrollTop = messagesEl.scrollHeight;
+            });
+
+            // keep layout stable even with many messages (messages container is scrollable)
+        }
+
+        leaveBtn.onclick = () => { if (!currentChatId) return; if (!confirm('Leave chat?')) return; detachChat(); }
+        function detachChat() { if (messagesRef) messagesRef.off(); currentChatId = null; currentChatRef = null; messagesEl.innerHTML = ''; chatArea.style.display = 'none'; welcomeArea.style.display = 'block'; chatTitle.textContent = '—'; chatSubtitle.textContent = '—'; }
+
+        deleteBtn.onclick = () => {
+            if (!currentChatId) return; if (!confirm('Delete this chat and all messages? This cannot be undone.')) return;
+            db.ref('chats/' + currentChatId).remove().then(() => { alert('Chat deleted'); detachChat(); }).catch(e => alert('Error: ' + e.message));
+        }
+
+        function sendMessage() {
+            if (!currentChatId) { alert('Join a chat first'); return; }
+            const text = String(messageInput.value || '').trim();
+            const nick = String(nicknameInput.value || '').trim() || 'Anon';
+            if (!text) return;
+            const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            db.ref(`chats/${currentChatId}/messages`).push({ nickname: nick, text: text, time: t }).then(() => { messageInput.value = ''; messageInput.focus(); }).catch(e => alert('Error: ' + e.message));
+        }
+
+        sendBtn.onclick = sendMessage; messageInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+
+        searchBtn.onclick = () => renderChatList(searchInput.value.trim()); searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') renderChatList(searchInput.value.trim()); });
+
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        // initial
+        renderChatList();
+    </script>
+</body>
+</html>
+
