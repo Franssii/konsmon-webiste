@@ -1,5 +1,5 @@
 <!-- BY FRANS -->
-<!-- 1.0.0.3 -->
+<!-- 1.0.1.0 -->
 <!-- 9.08.2025 -->
 
 <!DOCTYPE html>
@@ -10,7 +10,7 @@
     <title>Konsmon Chat — multiroom (dark)</title>
     <link rel="icon" href="gfx/radioactive_icon.png" type="image/x-icon">
 
-    <!-- Firebase SDK (compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database-compat.js"></script>
 
@@ -37,7 +37,6 @@
             color: var(--text)
         }
 
-        /* Layout */
         .app {
             height: 94vh;
             width: 96vw;
@@ -47,7 +46,6 @@
             align-items: stretch
         }
 
-        /* Sidebar */
         .sidebar {
             width: 300px;
             min-width: 200px;
@@ -121,12 +119,12 @@
             color: var(--text)
         }
 
-        /* Main */
         .main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100%
+            height: 100%;
+            min-height: 0; 
         }
 
         .panel {
@@ -136,7 +134,16 @@
             padding: 12px;
             flex: 1;
             display: flex;
-            flex-direction: column
+            flex-direction: column;
+            min-height: 0; 
+        }
+
+        #chatArea {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            min-height: 0;
+            height: 100%;
         }
 
         .welcome {
@@ -170,7 +177,6 @@
                 color: var(--text)
             }
 
-        /* Chat area */
         .chat-top {
             display: flex;
             justify-content: space-between;
@@ -183,19 +189,18 @@
                 opacity: .8
             }
 
-        /* messages container: fixed header + flexible scrollable area */
         .messages {
             flex: 1;
-            overflow: auto;
+            min-height: 0;
+            overflow-y: auto;
             padding: 14px;
             border-radius: 6px;
             background: linear-gradient(180deg,#070808,#0a0b0c);
             display: flex;
             flex-direction: column;
-            gap: 10px
+            gap: 10px;
         }
 
-        /* message bubble */
         .message {
             display: inline-block;
             max-width: 72%;
@@ -212,7 +217,6 @@
             margin-bottom: 6px
         }
 
-        /* input row: nickname (short) on left, message input on right */
         .input-row {
             display: flex;
             gap: 8px;
@@ -257,7 +261,6 @@
             cursor: pointer
         }
 
-        /* Modal */
         .modal-backdrop {
             position: fixed;
             inset: 0;
@@ -375,6 +378,8 @@
         <div class="modal" id="modalContent"></div>
     </div>
 
+
+
     <script>
         // FIREBASE CONFIG
         const firebaseConfig = {
@@ -390,6 +395,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+
 
         // UI refs
         const chatListEl = document.getElementById('chatList');
@@ -413,7 +420,9 @@
         const modal = document.getElementById('modal');
         const modalContent = document.getElementById('modalContent');
 
-        // state
+
+
+        // State
         let chatsCache = {};
         let currentChatId = null;
         let currentChatRef = null;
@@ -423,7 +432,9 @@
         function closeModal() { modal.style.display = 'none'; modalContent.innerHTML = ''; }
         function escapeHtml(text) { return String(text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
-        // render list
+
+
+        // Render list
         const chatsRef = db.ref('chats');
         chatsRef.on('value', snap => { chatsCache = snap.val() || {}; renderChatList(searchInput.value.trim()); });
 
@@ -441,27 +452,46 @@
             });
         }
 
-        // create modal
+        // Create modal
         function openCreateModal() {
             showModal(`
-                            <h4>Create new chat</h4>
-                            <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                            <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" /></div>
-                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button id="cancelCreate" class="btn btn-ghost">Cancel</button><button id="confirmCreate" class="btn btn-primary">Create</button></div>
-                          `);
+                <h4>Create new chat</h4>
+                <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
+                <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
+                <button id="confirmCreate" class="btn btn-primary">Create</button>
+                </div>
+    `       );
+
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
                 const name = String(document.getElementById('newName').value || '').trim();
                 const pass = String(document.getElementById('newPass').value || '');
+                const deletePass = String(document.getElementById('newDeletePass').value || '');
                 if (!name) { alert('Provide chat name'); return; }
+                if (!deletePass) { alert('Provide delete password'); return; }
                 const newRef = chatsRef.push();
-                newRef.set({ name: name, password: pass, createdAt: Date.now() }).then(() => { closeModal(); attemptJoin(newRef.key, true, pass); }).catch(e => alert('Error: ' + e.message));
+                newRef.set({
+                    name: name,
+                    password: pass,
+                    deletePassword: deletePass,
+                    createdAt: Date.now()
+                }).then(() => {
+                    closeModal();
+                    attemptJoin(newRef.key, true, pass);
+                }).catch(e => alert('Error: ' + e.message));
             }
         }
 
+
         btnCreate.onclick = openCreateModal; createQuick.onclick = openCreateModal; btnRefresh.onclick = () => renderChatList(searchInput.value.trim());
 
-        // join modal
+
+
+
+        // Join modal
         function attemptJoin(id, skipPrompt = false, knownPass = '') {
             const chat = chatsCache[id]; if (!chat) { alert('Chat not found'); return; }
             if (skipPrompt) { joinChat(id); return; }
@@ -473,38 +503,83 @@
             }
         }
 
-        function joinChat(id) {
-            currentChatId = id; currentChatRef = db.ref('chats/' + id);
-            const chat = chatsCache[id] || {};
-            chatTitle.textContent = chat.name || '—'; chatSubtitle.textContent = 'ID: ' + id;
-            welcomeArea.style.display = 'none'; chatArea.style.display = 'flex'; messagesEl.innerHTML = '';
 
-            // detach previous
+
+
+
+        function joinChat(id) {
+            currentChatId = id;
+            currentChatRef = db.ref('chats/' + id);
+            const chat = chatsCache[id] || {};
+            chatTitle.textContent = chat.name || '—';
+            chatSubtitle.textContent = 'ID: ' + id;
+            welcomeArea.style.display = 'none';
+            chatArea.style.display = 'flex';
+            messagesEl.innerHTML = '';
+
+            // Detach previous
             if (messagesRef) messagesRef.off();
             messagesRef = db.ref(`chats/${id}/messages`);
 
-            // listen for additions
+            // Listen for additions
             messagesRef.on('child_added', snap => {
                 const m = snap.val();
                 const msgWrap = document.createElement('div');
-                const meta = document.createElement('div'); meta.className = 'meta-line'; meta.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}`;
-                const bubble = document.createElement('div'); bubble.className = 'message'; bubble.textContent = m.text || '';
-                msgWrap.appendChild(meta); msgWrap.appendChild(bubble);
+                const meta = document.createElement('div'); meta.className = 'meta-line';
+                meta.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}`;
+                const bubble = document.createElement('div'); bubble.className = 'message';
+                bubble.textContent = m.text || '';
+                msgWrap.appendChild(meta);
+                msgWrap.appendChild(bubble);
                 messagesEl.appendChild(msgWrap);
-                // keep scroll at bottom
-                messagesEl.scrollTop = messagesEl.scrollHeight;
-            });
 
-            // keep layout stable even with many messages (messages container is scrollable)
+                // Auto-scroll
+                const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
+                const shouldAutoScroll = distanceFromBottom < 100;
+                if (shouldAutoScroll) {
+                    messagesEl.scrollTop = messagesEl.scrollHeight;
+                }
+            });
         }
 
         leaveBtn.onclick = () => { if (!currentChatId) return; if (!confirm('Leave chat?')) return; detachChat(); }
         function detachChat() { if (messagesRef) messagesRef.off(); currentChatId = null; currentChatRef = null; messagesEl.innerHTML = ''; chatArea.style.display = 'none'; welcomeArea.style.display = 'block'; chatTitle.textContent = '—'; chatSubtitle.textContent = '—'; }
 
+
+
+
+
+
         deleteBtn.onclick = () => {
-            if (!currentChatId) return; if (!confirm('Delete this chat and all messages? This cannot be undone.')) return;
-            db.ref('chats/' + currentChatId).remove().then(() => { alert('Chat deleted'); detachChat(); }).catch(e => alert('Error: ' + e.message));
-        }
+            if (!currentChatId) return;
+            const chat = chatsCache[currentChatId];
+            if (!chat) { alert('Chat data not found'); return; }
+
+            showModal(`
+                <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+                <div class="row"><label>Delete password</label><input id="deletePassInput" type="password" placeholder="Enter delete password" /></div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+                <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+                </div>
+    `       );
+
+            document.getElementById('cancelDelete').onclick = closeModal;
+            document.getElementById('confirmDelete').onclick = () => {
+                const enteredPass = String(document.getElementById('deletePassInput').value || '');
+                if (enteredPass === (chat.deletePassword || '')) {
+                    db.ref('chats/' + currentChatId).remove()
+                        .then(() => { alert('Chat deleted'); closeModal(); detachChat(); })
+                        .catch(e => alert('Error: ' + e.message));
+                } else {
+                    alert('Wrong delete password');
+                }
+            };
+        };
+
+
+
+
 
         function sendMessage() {
             if (!currentChatId) { alert('Join a chat first'); return; }
@@ -521,8 +596,13 @@
 
         modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
-        // initial
+
+
+
+
+        // Initial
         renderChatList();
     </script>
 </body>
 </html>
+
