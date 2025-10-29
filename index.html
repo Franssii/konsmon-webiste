@@ -124,7 +124,7 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-height: 0; 
+            min-height: 0;
         }
 
         .panel {
@@ -135,7 +135,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0; 
+            min-height: 0;
         }
 
         #chatArea {
@@ -208,8 +208,10 @@
             border-radius: 10px;
             background: #02475e;
             color: var(--text);
-            word-wrap: break-word
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
+
 
         .meta-line {
             font-size: 12px;
@@ -238,19 +240,11 @@
                 color: var(--text)
             }
 
-        .msg-input textarea {
+        .msg-input {
             flex: 1;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid var(--muted);
-            background: #0f1415;
-            color: var(--text);
-            resize: none;
-            height: 42px;
-            line-height: 1.4;
-            font-family: inherit;
+            display: flex;
+            gap: 8px
         }
-
 
             .msg-input input {
                 flex: 1;
@@ -259,6 +253,22 @@
                 border: 1px solid var(--muted);
                 background: #0f1415;
                 color: var(--text)
+            }
+
+            .msg-input textarea {
+                flex: 1;
+                min-height: 42px;
+                max-height: 120px;
+                width: 100%;
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid var(--muted);
+                background: #0f1415;
+                color: var(--text);
+                resize: none;
+                line-height: 1.4;
+                font-family: inherit;
+                overflow-y: auto;
             }
 
         .send-btn {
@@ -327,7 +337,7 @@
     </style>
 </head>
 <body>
-    <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:var(--text); margin-left: 29px">KONSMON CHAT WEBSITE ☢</h1>
+    <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:var(--text); margin-left: 29px">KONSMON CHAT WEBSITE</h1>
 
     <div class="app">
         <div class="sidebar">
@@ -372,7 +382,7 @@
                     <div class="input-row">
                         <div class="nick-input"><input id="nicknameInput" placeholder="Your nick..." /></div>
                         <div class="msg-input">
-                            <textarea id="messageInput" placeholder="Type here... "></textarea>
+                            <textarea id="messageInput" placeholder="Type here ..."></textarea>
                             <button id="sendBtn" class="send-btn">Send</button>
                         </div>
                     </div>
@@ -403,14 +413,7 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let adminPassword = null;
 
-        //ADMIN PASS
-        db.ref('admin/password').once('value').then(snap => {
-            adminPassword = snap.val() || '';
-        }).catch(err => {
-            console.error('admin passworld was not found', err);
-        });
 
 
         // UI refs
@@ -470,15 +473,15 @@
         // Create modal
         function openCreateModal() {
             showModal(`
-                <h4>Create new chat</h4>
-                <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
-                <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
-                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
-                <button id="confirmCreate" class="btn btn-primary">Create</button>
-                </div>
-    `       );
+                    <h4>Create new chat</h4>
+                    <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                    <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
+                    <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                    <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
+                    <button id="confirmCreate" class="btn btn-primary">Create</button>
+                    </div>
+        `       );
 
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
@@ -525,22 +528,21 @@
             }
 
             showModal(`
-            <h4>Join ${escapeHtml(chat.name)}</h4>
-            <div class="row">
-            <label>Password</label>
-            <input id="joinPass" type="password" placeholder="Password"/>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-            <button id="confirmJoin" class="btn btn-primary">Join</button>
-            </div>
-    `       );
+                <h4>Join ${escapeHtml(chat.name)}</h4>
+                <div class="row">
+                <label>Password</label>
+                <input id="joinPass" type="password" placeholder="Password"/>
+                </div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
+                <button id="confirmJoin" class="btn btn-primary">Join</button>
+                </div>
+        `       );
 
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
                 const p = String(document.getElementById('joinPass').value || '');
-
-                if (p === (chat.password || '') || p === adminPassword) {
+                if (p === (chat.password || '')) {
                     closeModal();
                     joinChat(id, p);
                 } else {
@@ -548,7 +550,6 @@
                 }
             };
         }
-
 
 
 
@@ -603,29 +604,20 @@
             if (!chat) { alert('Chat data not found'); return; }
 
             showModal(`
-            <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
-            <div class="row">
-            <label>Delete password</label>
-            <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
-            </div>
-               <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
-            <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
-            </div>
-    `       );
+                    <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+                    <div class="row"><label>Delete password</label><input id="deletePassInput" type="password" placeholder="Enter delete password" /></div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                    <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+                    <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+                    </div>
+        `       );
 
             document.getElementById('cancelDelete').onclick = closeModal;
             document.getElementById('confirmDelete').onclick = () => {
-            const enteredPass = String(document.getElementById('deletePassInput').value || '');
-
-
-            if (enteredPass === (chat.deletePassword || '') || enteredPass === adminPassword) {
+                const enteredPass = String(document.getElementById('deletePassInput').value || '');
+                if (enteredPass === (chat.deletePassword || '')) {
                     db.ref('chats/' + currentChatId).remove()
-                        .then(() => {
-                            alert('Chat deleted');
-                            closeModal();
-                            detachChat();
-                        })
+                        .then(() => { alert('Chat deleted'); closeModal(); detachChat(); })
                         .catch(e => alert('Error: ' + e.message));
                 } else {
                     alert('Wrong delete password');
@@ -633,14 +625,15 @@
             };
         };
 
-        f
 
 
 
 
         function sendMessage() {
             if (!currentChatId) { alert('Join a chat first'); return; }
+
             let text = String(messageInput.value || '').trim();
+
             const wrapLimit = 100;
             if (text.length > wrapLimit) {
                 let wrapped = '';
@@ -649,6 +642,7 @@
                 }
                 text = wrapped.trimEnd();
             }
+
 
             const nick = String(nicknameInput.value || '').trim() || 'Anon';
             if (!text) return;
@@ -660,11 +654,10 @@
 
         messageInput.addEventListener('keydown', e => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
+                e.preventDefault(); 
+                sendMessage();     
             }
         });
-
 
 
         searchBtn.onclick = () => renderChatList(searchInput.value.trim()); searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') renderChatList(searchInput.value.trim()); });
