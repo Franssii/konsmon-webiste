@@ -413,7 +413,15 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        // ADMIN PASSWORD
+        let adminPassword = null;
 
+        // Pobranie hasła admina z bazy
+        db.ref('admin/password').once('value').then(snap => {
+            adminPassword = snap.val() || '';
+        }).catch(err => {
+            console.error('error, admin passowrld was not found', err);
+        });
 
 
         // UI refs
@@ -528,21 +536,23 @@
             }
 
             showModal(`
-                <h4>Join ${escapeHtml(chat.name)}</h4>
-                <div class="row">
-                <label>Password</label>
-                <input id="joinPass" type="password" placeholder="Password"/>
-                </div>
-                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-                <button id="confirmJoin" class="btn btn-primary">Join</button>
-                </div>
-        `       );
+            <h4>Join ${escapeHtml(chat.name)}</h4>
+            <div class="row">
+            <label>Password</label>
+            <input id="joinPass" type="password" placeholder="Password"/>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
+            <button id="confirmJoin" class="btn btn-primary">Join</button>
+            </div>
+    `       );
 
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
                 const p = String(document.getElementById('joinPass').value || '');
-                if (p === (chat.password || '')) {
+
+
+                if (p === (chat.password || '') || p === adminPassword) {
                     closeModal();
                     joinChat(id, p);
                 } else {
@@ -550,6 +560,7 @@
                 }
             };
         }
+
 
 
 
@@ -604,26 +615,36 @@
             if (!chat) { alert('Chat data not found'); return; }
 
             showModal(`
-                    <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
-                    <div class="row"><label>Delete password</label><input id="deletePassInput" type="password" placeholder="Enter delete password" /></div>
-                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                    <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
-                    <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
-                    </div>
-        `       );
+            <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+            <div class="row">
+            <label>Delete password</label>
+            <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+            <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+            </div>
+    `       );
 
             document.getElementById('cancelDelete').onclick = closeModal;
             document.getElementById('confirmDelete').onclick = () => {
                 const enteredPass = String(document.getElementById('deletePassInput').value || '');
-                if (enteredPass === (chat.deletePassword || '')) {
+
+
+                if (enteredPass === (chat.deletePassword || '') || enteredPass === adminPassword) {
                     db.ref('chats/' + currentChatId).remove()
-                        .then(() => { alert('Chat deleted'); closeModal(); detachChat(); })
+                        .then(() => {
+                            alert('Chat deleted');
+                            closeModal();
+                            detachChat();
+                        })
                         .catch(e => alert('Error: ' + e.message));
                 } else {
                     alert('Wrong delete password');
                 }
             };
         };
+
 
 
 
