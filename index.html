@@ -655,7 +655,7 @@
 
             let text = String(messageInput.value || '').trim();
 
-            const wrapLimit = 100;
+            const wrapLimit = 400;
             if (text.length > wrapLimit) {
                 let wrapped = '';
                 for (let i = 0; i < text.length; i += wrapLimit) {
@@ -694,5 +694,6 @@
     </script>
 </body>
 </html>
+
 
 
