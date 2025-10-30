@@ -338,7 +338,16 @@
 </head>
 <body>
     <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:var(--text); margin-left: 29px">KONSMON CHAT WEBSITE ☢</h1>
-
+    <div style="position:absolute; top:14px; right:26px;">
+        <button id="btnSignup" class="btn btn-primary">Sign up</button>
+    </div>
+    <div style="position:absolute; top:14px; right:26px; display:flex; gap:8px;">
+        <button id="btnSignin" class="btn btn-ghost">Sign in</button>
+        <button id="btnSignup" class="btn btn-primary">Sign up</button>
+    </div>
+    <div id="userPanel" style="position:absolute; top:14px; right:26px; display:none; background:var(--panel); border:1px solid var(--muted); padding:8px 14px; border-radius:8px; color:var(--text);">
+        Logged in as <strong id="currentUserNick"></strong>
+    </div>
     <div class="app">
         <div class="sidebar">
             <h2>CHAT LIST: </h2>
@@ -380,7 +389,6 @@
                     <div id="messages" class="messages"></div>
 
                     <div class="input-row">
-                        <div class="nick-input"><input id="nicknameInput" placeholder="Your nick..." /></div>
                         <div class="msg-input">
                             <textarea id="messageInput" placeholder="Type here ..."></textarea>
                             <button id="sendBtn" class="send-btn">Send</button>
@@ -481,15 +489,15 @@
         // Create modal
         function openCreateModal() {
             showModal(`
-                    <h4>Create new chat</h4>
-                    <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                    <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
-                    <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
-                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                    <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
-                    <button id="confirmCreate" class="btn btn-primary">Create</button>
-                    </div>
-        `       );
+                                <h4>Create new chat</h4>
+                                <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                                <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
+                                <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
+                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
+                                <button id="confirmCreate" class="btn btn-primary">Create</button>
+                                </div>
+                    `       );
 
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
@@ -510,6 +518,131 @@
                 }).catch(e => alert('Error: ' + e.message));
             }
         }
+
+        // Sign up button
+        const btnSignup = document.getElementById('btnSignup');
+
+        // Open signup modal
+        btnSignup.onclick = () => {
+            showModal(`
+                    <h4>Create account</h4>
+                    <div class="row">
+                    <label>Username</label>
+                    <input id="signupNick" placeholder="Enter username" />
+                    </div>
+                    <div class="row">
+                    <label>Password</label>
+                    <input id="signupPass" type="password" placeholder="Enter password" />
+                    </div>
+                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                    <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
+                    <button id="confirmSignup" class="btn btn-primary">Create</button>
+                    </div>
+                    `);
+
+            document.getElementById('cancelSignup').onclick = closeModal;
+            document.getElementById('confirmSignup').onclick = () => {
+                const nick = String(document.getElementById('signupNick').value || '').trim();
+                const pass = String(document.getElementById('signupPass').value || '').trim();
+
+                if (!nick || !pass) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+
+                const usersRef = db.ref('users');
+                usersRef.orderByChild('nick').equalTo(nick).once('value', snapshot => {
+                    if (snapshot.exists()) {
+                        alert('This username is already taken');
+                    } else {
+                        usersRef.push({
+                            nick: nick,
+                            password: pass,
+                            createdAt: Date.now()
+                        }).then(() => {
+                            alert('Account created successfully!');
+                            closeModal();
+                        }).catch(err => alert('Error creating account: ' + err.message));
+                    }
+                });
+            };
+        };
+
+        // Sign in
+        const btnSignin = document.getElementById('btnSignin');
+        const userPanel = document.getElementById('userPanel');
+        const currentUserNickEl = document.getElementById('currentUserNick');
+
+        let currentUser = null;
+
+        // Open login modal
+        btnSignin.onclick = () => {
+            showModal(`
+                <h4>Sign in</h4>
+                <div class="row">
+                <label>Username</label>
+                <input id="signinNick" placeholder="Enter username" />
+                </div>
+                <div class="row">
+                <label>Password</label>
+                <input id="signinPass" type="password" placeholder="Enter password" />
+                </div>
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                <button id="cancelSignin" class="btn btn-ghost">Cancel</button>
+                <button id="confirmSignin" class="btn btn-primary">Login</button>
+                </div>
+                `);
+
+            document.getElementById('cancelSignin').onclick = closeModal;
+            document.getElementById('confirmSignin').onclick = () => {
+                const nick = String(document.getElementById('signinNick').value || '').trim();
+                const pass = String(document.getElementById('signinPass').value || '').trim();
+                if (!nick || !pass) {
+                    alert('Please fill in both fields');
+                    return;
+                }
+
+                const usersRef = db.ref('users');
+                usersRef.orderByChild('nick').equalTo(nick).once('value', snap => {
+                    if (!snap.exists()) {
+                        alert('User not found');
+                        return;
+                    }
+
+                    const userData = Object.values(snap.val())[0];
+                    if (userData.password === pass) {
+                        currentUser = { nick, uid: Object.keys(snap.val())[0] };
+                        localStorage.setItem('konsmon_user', JSON.stringify(currentUser));
+                        updateUserUI();
+                        closeModal();
+                    } else {
+                        alert('Incorrect password');
+                    }
+                });
+            };
+        };
+
+        // Update interface after login
+        function updateUserUI() {
+            if (currentUser) {
+                btnSignin.style.display = 'none';
+                btnSignup.style.display = 'none';
+                userPanel.style.display = 'block';
+                currentUserNickEl.textContent = currentUser.nick;
+            } else {
+                btnSignin.style.display = '';
+                btnSignup.style.display = '';
+                userPanel.style.display = 'none';
+            }
+        }
+
+        // Load from localStorage on page start
+        const storedUser = localStorage.getItem('konsmon_user');
+        if (storedUser) {
+            currentUser = JSON.parse(storedUser);
+            updateUserUI();
+        }
+
 
 
         btnCreate.onclick = openCreateModal; createQuick.onclick = openCreateModal; btnRefresh.onclick = () => renderChatList(searchInput.value.trim());
@@ -536,16 +669,16 @@
             }
 
             showModal(`
-            <h4>Join ${escapeHtml(chat.name)}</h4>
-            <div class="row">
-            <label>Password</label>
-            <input id="joinPass" type="password" placeholder="Password"/>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-            <button id="confirmJoin" class="btn btn-primary">Join</button>
-            </div>
-    `       );
+                        <h4>Join ${escapeHtml(chat.name)}</h4>
+                        <div class="row">
+                        <label>Password</label>
+                        <input id="joinPass" type="password" placeholder="Password"/>
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                        <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
+                        <button id="confirmJoin" class="btn btn-primary">Join</button>
+                        </div>
+                `       );
 
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
@@ -615,16 +748,16 @@
             if (!chat) { alert('Chat data not found'); return; }
 
             showModal(`
-            <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
-            <div class="row">
-            <label>Delete password</label>
-            <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
-            <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
-            </div>
-    `       );
+                        <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+                        <div class="row">
+                        <label>Delete password</label>
+                        <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                        <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+                        <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+                        </div>
+                `       );
 
             document.getElementById('cancelDelete').onclick = closeModal;
             document.getElementById('confirmDelete').onclick = () => {
@@ -665,7 +798,7 @@
             }
 
 
-            const nick = String(nicknameInput.value || '').trim() || 'Anon';
+            const nick = currentUser ? currentUser.nick : 'Anon';
             if (!text) return;
             const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             db.ref(`chats/${currentChatId}/messages`).push({ nickname: nick, text: text, time: t }).then(() => { messageInput.value = ''; messageInput.focus(); }).catch(e => alert('Error: ' + e.message));
@@ -675,8 +808,8 @@
 
         messageInput.addEventListener('keydown', e => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); 
-                sendMessage();     
+                e.preventDefault();
+                sendMessage();
             }
         });
 
