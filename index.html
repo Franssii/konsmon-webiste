@@ -338,9 +338,6 @@
 </head>
 <body>
     <h1 style="width:96vw;max-width:1200px;margin:8px auto 0;color:var(--text); margin-left: 29px">KONSMON CHAT WEBSITE ☢</h1>
-    <div style="position:absolute; top:14px; right:26px;">
-        <button id="btnSignup" class="btn btn-primary">Sign up</button>
-    </div>
     <div style="position:absolute; top:14px; right:26px; display:flex; gap:8px;">
         <button id="btnSignin" class="btn btn-ghost">Sign in</button>
         <button id="btnSignup" class="btn btn-primary">Sign up</button>
@@ -353,6 +350,7 @@
             <button id="logoutBtn" class="btn btn-ghost" style="width:100%;">Log out</button>
         </div>
     </div>
+
 
     <div class="app">
         <div class="sidebar">
@@ -495,15 +493,15 @@
         // Create modal
         function openCreateModal() {
             showModal(`
-                                    <h4>Create new chat</h4>
-                                    <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                                    <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
-                                    <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
-                                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                                    <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
-                                    <button id="confirmCreate" class="btn btn-primary">Create</button>
-                                    </div>
-                        `       );
+                                        <h4>Create new chat</h4>
+                                        <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                                        <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
+                                        <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
+                                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                        <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
+                                        <button id="confirmCreate" class="btn btn-primary">Create</button>
+                                        </div>
+                            `       );
 
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
@@ -530,20 +528,20 @@
         if (btnSignup) {
             btnSignup.onclick = () => {
                 showModal(`
-                    <h4>Create account</h4>
-                    <div class="row">
-                    <label>Username</label>
-                    <input id="signupNick" placeholder="Enter username" />
-                    </div>
-                    <div class="row">
-                    <label>Password</label>
-                    <input id="signupPass" type="password" placeholder="Enter password" />
-                    </div>
-                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                    <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
-                    <button id="confirmSignup" class="btn btn-primary">Create</button>
-                    </div>
-            `);
+                        <h4>Create account</h4>
+                        <div class="row">
+                        <label>Username</label>
+                        <input id="signupNick" placeholder="Enter username" />
+                        </div>
+                        <div class="row">
+                        <label>Password</label>
+                        <input id="signupPass" type="password" placeholder="Enter password" />
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                        <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
+                        <button id="confirmSignup" class="btn btn-primary">Create</button>
+                        </div>
+                `);
 
                 document.getElementById('cancelSignup').onclick = closeModal;
                 document.getElementById('confirmSignup').onclick = () => {
@@ -566,51 +564,7 @@
         }
 
 
-        // Open signup modal
-        btnSignup.onclick = () => {
-            showModal(`
-                        <h4>Create account</h4>
-                        <div class="row">
-                        <label>Username</label>
-                        <input id="signupNick" placeholder="Enter username" />
-                        </div>
-                        <div class="row">
-                        <label>Password</label>
-                        <input id="signupPass" type="password" placeholder="Enter password" />
-                        </div>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                        <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
-                        <button id="confirmSignup" class="btn btn-primary">Create</button>
-                        </div>
-                        `);
 
-            document.getElementById('cancelSignup').onclick = closeModal;
-            document.getElementById('confirmSignup').onclick = () => {
-                const nick = String(document.getElementById('signupNick').value || '').trim();
-                const pass = String(document.getElementById('signupPass').value || '').trim();
-
-                if (!nick || !pass) {
-                    alert('Please fill in all fields');
-                    return;
-                }
-
-                const usersRef = db.ref('users');
-                usersRef.orderByChild('nick').equalTo(nick).once('value', snapshot => {
-                    if (snapshot.exists()) {
-                        alert('This username is already taken');
-                    } else {
-                        usersRef.push({
-                            nick: nick,
-                            password: pass,
-                            createdAt: Date.now()
-                        }).then(() => {
-                            alert('Account created successfully!');
-                            closeModal();
-                        }).catch(err => alert('Error creating account: ' + err.message));
-                    }
-                });
-            };
-        };
 
         // Sign in
         const btnSignin = document.getElementById('btnSignin');
@@ -622,20 +576,20 @@
         // Open login modal
         btnSignin.onclick = () => {
             showModal(`
-                    <h4>Sign in</h4>
-                    <div class="row">
-                    <label>Username</label>
-                    <input id="signinNick" placeholder="Enter username" />
-                    </div>
-                    <div class="row">
-                    <label>Password</label>
-                    <input id="signinPass" type="password" placeholder="Enter password" />
-                    </div>
-                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                    <button id="cancelSignin" class="btn btn-ghost">Cancel</button>
-                    <button id="confirmSignin" class="btn btn-primary">Login</button>
-                    </div>
-                    `);
+                        <h4>Sign in</h4>
+                        <div class="row">
+                        <label>Username</label>
+                        <input id="signinNick" placeholder="Enter username" />
+                        </div>
+                        <div class="row">
+                        <label>Password</label>
+                        <input id="signinPass" type="password" placeholder="Enter password" />
+                        </div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                        <button id="cancelSignin" class="btn btn-ghost">Cancel</button>
+                        <button id="confirmSignin" class="btn btn-primary">Login</button>
+                        </div>
+                        `);
 
             document.getElementById('cancelSignin').onclick = closeModal;
             document.getElementById('confirmSignin').onclick = () => {
@@ -732,16 +686,16 @@
             }
 
             showModal(`
-                            <h4>Join ${escapeHtml(chat.name)}</h4>
-                            <div class="row">
-                            <label>Password</label>
-                            <input id="joinPass" type="password" placeholder="Password"/>
-                            </div>
-                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                            <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-                            <button id="confirmJoin" class="btn btn-primary">Join</button>
-                            </div>
-                    `       );
+                                <h4>Join ${escapeHtml(chat.name)}</h4>
+                                <div class="row">
+                                <label>Password</label>
+                                <input id="joinPass" type="password" placeholder="Password"/>
+                                </div>
+                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
+                                <button id="confirmJoin" class="btn btn-primary">Join</button>
+                                </div>
+                        `       );
 
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
@@ -811,16 +765,16 @@
             if (!chat) { alert('Chat data not found'); return; }
 
             showModal(`
-                            <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
-                            <div class="row">
-                            <label>Delete password</label>
-                            <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
-                            </div>
-                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                            <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
-                            <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
-                            </div>
-                    `       );
+                                <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+                                <div class="row">
+                                <label>Delete password</label>
+                                <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
+                                </div>
+                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+                                <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+                                </div>
+                        `       );
 
             document.getElementById('cancelDelete').onclick = closeModal;
             document.getElementById('confirmDelete').onclick = () => {
