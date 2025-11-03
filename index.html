@@ -227,19 +227,19 @@
             align-items: center
         }
 
-        .nick-input {
-            width: 22%;
-            min-width: 120px
+        
+
+        .nick-field {
+            width: 200px;
+            min-width: 160px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--muted);
+            background: var(--muted);
+            color: var(--text);
+            font-size: 14px;
         }
 
-            .nick-input input {
-                width: 100%;
-                padding: 10px;
-                border-radius: 6px;
-                border: 1px solid var(--muted);
-                background: var(--muted);
-                color: var(--text)
-            }
 
         .msg-input {
             flex: 1;
@@ -309,6 +309,25 @@
                 margin-bottom: 8px
             }
 
+        .trash-icon {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+            .trash-icon:hover {
+                opacity: 1;
+            }
+
+        .message {
+            position: relative;
+            transition: background 0.2s;
+        }
+
+            .message:hover {
+                background: #035873;
+            }
+
+
         /* small screens */
         @media(max-width:900px) {
             .app {
@@ -337,16 +356,15 @@
         }
 
         .message img {
-        display: block;
-        max-width: 320px;
-        max-height: 420px;
-        width: auto;
-        height: auto;
-        border-radius: 8px;
-        margin-top: 6px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }
-
+            display: block;
+            max-width: 320px;
+            max-height: 420px;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        }
     </style>
 </head>
 <body>
@@ -406,16 +424,13 @@
                     <div id="messages" class="messages"></div>
 
                     <div class="input-row">
+                        <input id="nicknameInput" class="nick-field" placeholder="Enter nick (optional)">
                         <div class="msg-input">
                             <textarea id="messageInput" placeholder="Type here ..."></textarea>
-
                             <input id="imageInput" type="file" accept="image/*" style="display:none" />
                             <button id="uploadBtn" class="btn btn-ghost" title="Upload image">&</button>
-
                             <button id="sendBtn" class="send-btn">Send</button>
-
                         </div>
-
                     </div>
                 </div>
 
@@ -513,15 +528,15 @@
         // Create modal
         function openCreateModal() {
             showModal(`
-                                        <h4>Create new chat</h4>
-                                        <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
-                                        <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
-                                        <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
-                                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                                        <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
-                                        <button id="confirmCreate" class="btn btn-primary">Create</button>
-                                        </div>
-                            `       );
+                                            <h4>Create new chat</h4>
+                                            <div class="row"><label>Name</label><input id="newName" placeholder="e.g. my_new_chat" /></div>
+                                            <div class="row"><label>Password</label><input id="newPass" placeholder="optional password" type="password" /></div>
+                                            <div class="row"><label>Delete password</label><input id="newDeletePass" placeholder="password to delete chat" type="password" /></div>
+                                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                            <button id="cancelCreate" class="btn btn-ghost">Cancel</button>
+                                            <button id="confirmCreate" class="btn btn-primary">Create</button>
+                                            </div>
+                                `       );
 
             document.getElementById('cancelCreate').onclick = closeModal;
             document.getElementById('confirmCreate').onclick = () => {
@@ -535,7 +550,8 @@
                     name: name,
                     password: pass,
                     deletePassword: deletePass,
-                    createdAt: Date.now()
+                    createdAt: Date.now(),
+                    allow_chat: 1
                 }).then(() => {
                     closeModal();
                     attemptJoin(newRef.key, true, pass);
@@ -548,20 +564,20 @@
         if (btnSignup) {
             btnSignup.onclick = () => {
                 showModal(`
-                        <h4>Create account</h4>
-                        <div class="row">
-                        <label>Username</label>
-                        <input id="signupNick" placeholder="Enter username" />
-                        </div>
-                        <div class="row">
-                        <label>Password</label>
-                        <input id="signupPass" type="password" placeholder="Enter password" />
-                        </div>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                        <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
-                        <button id="confirmSignup" class="btn btn-primary">Create</button>
-                        </div>
-                `);
+                            <h4>Create account</h4>
+                            <div class="row">
+                            <label>Username</label>
+                            <input id="signupNick" placeholder="Enter username" />
+                            </div>
+                            <div class="row">
+                            <label>Password</label>
+                            <input id="signupPass" type="password" placeholder="Enter password" />
+                            </div>
+                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                            <button id="cancelSignup" class="btn btn-ghost">Cancel</button>
+                            <button id="confirmSignup" class="btn btn-primary">Create</button>
+                            </div>
+                    `);
 
                 document.getElementById('cancelSignup').onclick = closeModal;
                 document.getElementById('confirmSignup').onclick = () => {
@@ -596,20 +612,20 @@
         // Open login modal
         btnSignin.onclick = () => {
             showModal(`
-                        <h4>Sign in</h4>
-                        <div class="row">
-                        <label>Username</label>
-                        <input id="signinNick" placeholder="Enter username" />
-                        </div>
-                        <div class="row">
-                        <label>Password</label>
-                        <input id="signinPass" type="password" placeholder="Enter password" />
-                        </div>
-                        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                        <button id="cancelSignin" class="btn btn-ghost">Cancel</button>
-                        <button id="confirmSignin" class="btn btn-primary">Login</button>
-                        </div>
-                        `);
+                            <h4>Sign in</h4>
+                            <div class="row">
+                            <label>Username</label>
+                            <input id="signinNick" placeholder="Enter username" />
+                            </div>
+                            <div class="row">
+                            <label>Password</label>
+                            <input id="signinPass" type="password" placeholder="Enter password" />
+                            </div>
+                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                            <button id="cancelSignin" class="btn btn-ghost">Cancel</button>
+                            <button id="confirmSignin" class="btn btn-primary">Login</button>
+                            </div>
+                            `);
 
             document.getElementById('cancelSignin').onclick = closeModal;
             document.getElementById('confirmSignin').onclick = () => {
@@ -706,16 +722,16 @@
             }
 
             showModal(`
-                                <h4>Join ${escapeHtml(chat.name)}</h4>
-                                <div class="row">
-                                <label>Password</label>
-                                <input id="joinPass" type="password" placeholder="Password"/>
-                                </div>
-                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                                <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
-                                <button id="confirmJoin" class="btn btn-primary">Join</button>
-                                </div>
-                        `       );
+                                    <h4>Join ${escapeHtml(chat.name)}</h4>
+                                    <div class="row">
+                                    <label>Password</label>
+                                    <input id="joinPass" type="password" placeholder="Password"/>
+                                    </div>
+                                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                    <button id="cancelJoin" class="btn btn-ghost">Cancel</button>
+                                    <button id="confirmJoin" class="btn btn-primary">Join</button>
+                                    </div>
+                            `       );
 
             document.getElementById('cancelJoin').onclick = closeModal;
             document.getElementById('confirmJoin').onclick = () => {
@@ -753,31 +769,76 @@
             // Listen for additions
             messagesRef.on('child_added', snap => {
                 const m = snap.val();
+                const msgId = snap.key; // ID
                 const msgWrap = document.createElement('div');
                 const meta = document.createElement('div'); meta.className = 'meta-line';
                 meta.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}`;
                 const bubble = document.createElement('div'); bubble.className = 'message';
+
+                // text
                 if (m.text) {
                     bubble.textContent = m.text;
                 } else if (m.imageBase64) {
                     const img = document.createElement('img');
                     img.src = m.imageBase64;
-                    img.style.maxWidth = '200px';
-                    img.style.borderRadius = '6px';
-                    img.style.display = 'block';
                     bubble.appendChild(img);
                 }
+
+
+                bubble.addEventListener('click', () => {
+                    if (!currentUser) return; 
+                    const existingTrash = bubble.querySelector('.trash-icon');
+                    if (existingTrash) {
+                        existingTrash.remove();
+                        return;
+                    }
+
+                    const trash = document.createElement('span');
+                    trash.className = 'trash-icon';
+                    trash.textContent = '🗑️';
+                    trash.style.cursor = 'pointer';
+                    trash.style.position = 'absolute';
+                    trash.style.right = '-26px';
+                    trash.style.top = '4px';
+                    trash.style.opacity = '0.7';
+                    trash.style.transition = 'opacity 0.2s';
+                    trash.onmouseenter = () => trash.style.opacity = '1';
+                    trash.onmouseleave = () => trash.style.opacity = '0.7';
+                    bubble.style.position = 'relative';
+                    bubble.appendChild(trash);
+
+                    trash.onclick = (e) => {
+                        e.stopPropagation();
+                        const confirmDel = confirm('Are you sure you want to delete this message?');
+                        if (!confirmDel) return;
+
+
+                        db.ref(`users/${currentUser.uid}`).once('value').then(snapUser => {
+                            const isAdmin = snapUser.val()?.admin === 1;
+                            if (isAdmin || m.userId === currentUser.uid) {
+                                db.ref(`chats/${currentChatId}/messages/${msgId}`).remove()
+                                    .then(() => {
+                                        msgWrap.remove();
+                                    })
+                                    .catch(e => alert('Error deleting message: ' + e.message));
+                            } else {
+                                alert('You can delete only your messages.');
+                            }
+                        });
+                    };
+                });
+
                 msgWrap.appendChild(meta);
                 msgWrap.appendChild(bubble);
                 messagesEl.appendChild(msgWrap);
 
-                // Auto-scroll
+                // autoscroll
                 const distanceFromBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight;
-                const shouldAutoScroll = distanceFromBottom < 100;
-                if (shouldAutoScroll) {
+                if (distanceFromBottom < 100) {
                     messagesEl.scrollTop = messagesEl.scrollHeight;
                 }
             });
+
         }
 
         leaveBtn.onclick = () => { if (!currentChatId) return; if (!confirm('Leave chat?')) return; detachChat(); }
@@ -794,16 +855,16 @@
             if (!chat) { alert('Chat data not found'); return; }
 
             showModal(`
-                                <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
-                                <div class="row">
-                                <label>Delete password</label>
-                                <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
-                                </div>
-                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-                                <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
-                                <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
-                                </div>
-                        `       );
+                                    <h4>Delete chat: ${escapeHtml(chat.name)}</h4>
+                                    <div class="row">
+                                    <label>Delete password</label>
+                                    <input id="deletePassInput" type="password" placeholder="Enter delete or admin password" />
+                                    </div>
+                                    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+                                    <button id="cancelDelete" class="btn btn-ghost">Cancel</button>
+                                    <button id="confirmDelete" class="btn btn-primary" style="background:#b91c1c;color:white">Delete</button>
+                                    </div>
+                            `       );
 
             document.getElementById('cancelDelete').onclick = closeModal;
             document.getElementById('confirmDelete').onclick = () => {
@@ -829,25 +890,103 @@
 
 
         // Send message
+        const uploadBtn = document.getElementById('uploadBtn');
+        const imageInput = document.getElementById('imageInput');
+        let selectedImageBase64 = null;
+
+        uploadBtn.onclick = () => {
+            imageInput.click();
+        };
+
+        imageInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                selectedImageBase64 = ev.target.result;
+                const preview = document.createElement('img');
+                preview.src = selectedImageBase64;
+                preview.style.maxWidth = '100px';
+                preview.style.maxHeight = '100px';
+                preview.style.borderRadius = '6px';
+                preview.style.marginTop = '4px';
+                messageInput.insertAdjacentElement('afterend', preview);
+                setTimeout(() => preview.remove(), 10000);
+            };
+            reader.readAsDataURL(file);
+        };
+
         function sendMessage() {
-            if (!currentChatId) { alert('Join a chat first'); return; }
-
-            let text = String(messageInput.value || '').trim();
-
-            const wrapLimit = 400;
-            if (text.length > wrapLimit) {
-                let wrapped = '';
-                for (let i = 0; i < text.length; i += wrapLimit) {
-                    wrapped += text.slice(i, i + wrapLimit) + '\n';
+            if (!currentChatId) {
+                alert('Join a chat first');
+                return;
+            }
+            const chatSettings = chatsCache[currentChatId];
+            if (chatSettings && chatSettings.allow_chat !== 1) {
+                if (!currentUser) {
+                    alert("Only admins can write in this chat.");
+                    return;
                 }
-                text = wrapped.trimEnd();
+                db.ref(`users/${currentUser.uid}`).once('value').then(snap => {
+                    const isAdmin = snap.val()?.admin === 1;
+                    if (!isAdmin) {
+                        alert("Only admins can write in this chat.");
+                        return;
+                    } else {
+                        actuallySendMessage(); 
+                    }
+                });
+                return; 
             }
 
+            actuallySendMessage(); 
 
-            const nick = currentUser ? currentUser.nick : 'Anon';
-            if (!text) return;
-            const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            db.ref(`chats/${currentChatId}/messages`).push({ nickname: nick, text: text, time: t }).then(() => { messageInput.value = ''; messageInput.focus(); }).catch(e => alert('Error: ' + e.message));
+            function actuallySendMessage() {
+                let text = String(messageInput.value || '').trim();
+                const nickInputVal = String(document.getElementById('nicknameInput').value || '').trim();
+
+                if (!text && !selectedImageBase64) return;
+
+                const wrapLimit = 400;
+                if (text.length > wrapLimit) {
+                    let wrapped = '';
+                    for (let i = 0; i < text.length; i += wrapLimit) {
+                        wrapped += text.slice(i, i + wrapLimit) + '\n';
+                    }
+                    text = wrapped.trimEnd();
+                }
+
+                let nick;
+                if (currentUser) {
+                    nick = currentUser.nick;
+                } else if (nickInputVal) {
+                    nick = nickInputVal;
+                } else {
+                    nick = 'Anon' + Math.floor(1000 + Math.random() * 9000);
+                }
+
+                const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const msgData = {
+                    nickname: nick,
+                    text: text || null,
+                    imageBase64: selectedImageBase64 || null,
+                    time: t,
+                    createdAt: Date.now(),
+                    userId: currentUser ? currentUser.uid : null
+                };
+
+                db.ref(`chats/${currentChatId}/messages`).push(msgData)
+                    .then(() => {
+                        messageInput.value = '';
+                        selectedImageBase64 = null;
+                        const existingPreview = document.querySelector('#messageInput + img');
+                        if (existingPreview) existingPreview.remove();
+                    })
+                    .catch(e => alert('Error: ' + e.message));
+            }
+
         }
 
         sendBtn.onclick = sendMessage;
@@ -859,44 +998,6 @@
             }
         });
 
-        const imageInput = document.getElementById('imageInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-
-        uploadBtn.addEventListener('click', () => {
-            if (!currentChatId) {
-                alert('Join a chat first');
-                return;
-            }
-            imageInput.click();
-        });
-
-        imageInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const maxSizeBytes = 200 * 1024; // 200 KB max (dla bezpieczeństwa)
-            if (file.size > maxSizeBytes) {
-                alert('Image too large (max 200 KB)');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = async function (event) {
-                const base64Data = event.target.result; // np. "data:image/png;base64,..."
-                const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                const message = {
-                    nickname: currentUser ? currentUser.nick : 'Anon',
-                    imageBase64: base64Data,
-                    time: t,
-                    createdAt: Date.now()
-                };
-
-                await db.ref(`chats/${currentChatId}/messages`).push(message);
-                //alert('Image sent!');
-            };
-            reader.readAsDataURL(file);
-        });
 
 
         searchBtn.onclick = () => renderChatList(searchInput.value.trim()); searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') renderChatList(searchInput.value.trim()); });
@@ -912,6 +1013,7 @@
     </script>
 </body>
 </html>
+
 
 
 
