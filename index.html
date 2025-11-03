@@ -13,6 +13,7 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-storage-compat.js"></script>
 
     <style>
         :root {
@@ -334,6 +335,18 @@
                 width: 30%
             }
         }
+
+        .message img {
+        display: block;
+        max-width: 320px;
+        max-height: 420px;
+        width: auto;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
     </style>
 </head>
 <body>
@@ -395,8 +408,14 @@
                     <div class="input-row">
                         <div class="msg-input">
                             <textarea id="messageInput" placeholder="Type here ..."></textarea>
+
+                            <input id="imageInput" type="file" accept="image/*" style="display:none" />
+                            <button id="uploadBtn" class="btn btn-ghost" title="Upload image">&</button>
+
                             <button id="sendBtn" class="send-btn">Send</button>
+
                         </div>
+
                     </div>
                 </div>
 
@@ -422,6 +441,7 @@
             appId: "1:1004639372000:web:49980358b5ac43526e8685",
             measurementId: "G-WJE8C8CY3E"
         };
+
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -737,7 +757,16 @@
                 const meta = document.createElement('div'); meta.className = 'meta-line';
                 meta.textContent = `[${m.time || ''}] ${m.nickname || 'Anon'}`;
                 const bubble = document.createElement('div'); bubble.className = 'message';
-                bubble.textContent = m.text || '';
+                if (m.text) {
+                    bubble.textContent = m.text;
+                } else if (m.imageBase64) {
+                    const img = document.createElement('img');
+                    img.src = m.imageBase64;
+                    img.style.maxWidth = '200px';
+                    img.style.borderRadius = '6px';
+                    img.style.display = 'block';
+                    bubble.appendChild(img);
+                }
                 msgWrap.appendChild(meta);
                 msgWrap.appendChild(bubble);
                 messagesEl.appendChild(msgWrap);
@@ -828,6 +857,45 @@
                 e.preventDefault();
                 sendMessage();
             }
+        });
+
+        const imageInput = document.getElementById('imageInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        uploadBtn.addEventListener('click', () => {
+            if (!currentChatId) {
+                alert('Join a chat first');
+                return;
+            }
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const maxSizeBytes = 200 * 1024; // 200 KB max (dla bezpieczeństwa)
+            if (file.size > maxSizeBytes) {
+                alert('Image too large (max 200 KB)');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function (event) {
+                const base64Data = event.target.result; // np. "data:image/png;base64,..."
+                const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const message = {
+                    nickname: currentUser ? currentUser.nick : 'Anon',
+                    imageBase64: base64Data,
+                    time: t,
+                    createdAt: Date.now()
+                };
+
+                await db.ref(`chats/${currentChatId}/messages`).push(message);
+                //alert('Image sent!');
+            };
+            reader.readAsDataURL(file);
         });
 
 
